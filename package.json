@@ -1,0 +1,34 @@
+{
+  "name": "elisjs",
+  "version": "0.1.0",
+  "description": "A functional Discord API wrapper focused on stability and performance.",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint ./src/**/* ./src/*",
+    "docs": "jsdoc ./src/**/* -d ./docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elis-team/elisjs.git"
+  },
+  "keywords": [
+    "elisjs",
+    "discord"
+  ],
+  "author": "elis-team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/elis-team/elisjs/issues"
+  },
+  "homepage": "https://github.com/elis-team/elisjs#readme",
+  "dependencies": {
+    "ws": "^7.5.2",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.3.5",
+    "eslint": "^7.30.0",
+    "jsdoc": "^3.6.7"
+  }
+}
