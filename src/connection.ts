@@ -42,8 +42,6 @@ const processData = ((client: Client, ws: WebSocket, data: Data): void => {
 
   client.lastSequence = parsed.s as (number | null);
 
-  console.log(parsed);
-
   if (parsed.op == 10) {
     initHeartbeat(client, ws, parsed.d as Record<string, unknown>);
   }
