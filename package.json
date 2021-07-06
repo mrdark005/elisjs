@@ -5,8 +5,7 @@
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",
-    "lint": "eslint ./src/**/* ./src/*",
-    "docs": "jsdoc ./src/**/* -d ./docs"
+    "lint": "eslint ./src/**/* ./src/*"
   },
   "repository": {
     "type": "git",
@@ -23,12 +22,10 @@
   },
   "homepage": "https://github.com/elis-team/elisjs#readme",
   "dependencies": {
-    "ws": "^7.5.2",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "ws": "^7.5.2"
   },
   "devDependencies": {
-    "typescript": "^4.3.5",
-    "eslint": "^7.30.0",
-    "jsdoc": "^3.6.7"
+    "typescript": "^4.3.5"
   }
 }
