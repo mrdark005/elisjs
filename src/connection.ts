@@ -14,13 +14,11 @@ try {
   });
 } catch {}
 
-const sendData = ((client: Client, ws: WebSocket, data: Record<string, unknown>): void => {
-  if (!client.options.compress) {
-    ws.send(JSON.stringify(data));
-  }
+export const sendData = ((client: Client, data: Record<string, unknown>): void => {
+  client.ws?.send(JSON.stringify(data));
 });
 
-const processData = ((client: Client, ws: WebSocket, data: Data): void => {
+const processData = ((client: Client, data: Data): void => {
   let parsed: Record<string, unknown>;
 
   if (client.options.compress) {
@@ -43,13 +41,33 @@ const processData = ((client: Client, ws: WebSocket, data: Data): void => {
   client.lastSequence = parsed.s as (number | null);
 
   if (parsed.op == 10) {
-    initHeartbeat(client, ws, parsed.d as Record<string, unknown>);
+    sendData(client, {
+      op: 2,
+      d: {
+        token: client.token,
+        properties: {
+          "$os": process.platform,
+          "$browser": "elisjs",
+          "$device": "elisjs"
+        },
+        compress: client.options.compress,
+        large_threshold: client.options.ws?.largeThreshold,
+        presence: {
+          status: client.user?.presence.status,
+          activities: [],
+          since: Date.now(),
+          afk: false
+        }
+      }
+    });
+
+    initHeartbeat(client, parsed.d as Record<string, unknown>);
   }
 });
 
-const initHeartbeat = ((client: Client, ws: WebSocket, payload: Record<string, unknown>): void => {
+const initHeartbeat = ((client: Client, payload: Record<string, unknown>): void => {
   setInterval(() => {
-    sendData(client, ws, {
+    sendData(client, {
       op: 1,
       d: client.lastSequence
     });
@@ -59,9 +77,9 @@ const initHeartbeat = ((client: Client, ws: WebSocket, payload: Record<string, u
 export const connect = ((client: Client): void => {
   if (client.options.compress && !zlib) throw new Error("Please install \"zlib-sync\" package.");
 
-  const ws = new WebSocket(`${gatewayURL}&encoding=json${client.options.compress ? "&compress=zlib-stream" : ""}`);
+  client.ws = new WebSocket(`${gatewayURL}&encoding=json${client.options.compress ? "&compress=zlib-stream" : ""}`);
 
-  ws.on("message", async (data) => {
-    await processData(client, ws, data);
+  client.ws.on("message", async (data) => {
+    await processData(client, data);
   });
 });
