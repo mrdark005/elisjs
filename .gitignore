@@ -1,4 +1,5 @@
 package-lock.json
+test.js
 docs/
 dist/
 node_modules/
