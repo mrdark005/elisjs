@@ -4,8 +4,7 @@
   "description": "A functional Discord API wrapper focused on stability and performance.",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "tsc",
-    "lint": "eslint ./src/**/* ./src/*"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
