@@ -8,10 +8,13 @@ import { Guild } from "./Guild";
 
 import Collection from "../utils/Collection";
 
+import { Intents, Intents_ALL } from "../constants";
+
 export interface ClientOptions {
   compress?: boolean;
   ws?: {
     largeThreshold: number;
+    intents: number | Intents[]
   }
 }
 
@@ -24,6 +27,7 @@ export interface Client {
   users: Collection<string, User>;
 
   ws?: WebSocket;
+  intents: number;
   lastSequence: number | null;
 
   login: (() => void);
@@ -35,8 +39,9 @@ export const create = ((token: string, options: ClientOptions): Client => {
     options: Object.assign({
       compress: false,
       ws: {
-        largeThreshold: 50
-      }
+        largeThreshold: 50,
+        intents: Intents_ALL
+      },
     }, options),
     token,
     get user() {
@@ -50,11 +55,23 @@ export const create = ((token: string, options: ClientOptions): Client => {
     users: new Collection<string, User>(),
 
     lastSequence: null,
+    intents: 0,
 
     login() {
       return connect(this);
     }
   });
+
+  if (typeof props.options.ws?.intents == "number") {
+    props.intents = props.options.ws?.intents;
+  } else if (Array.isArray(props.options.ws?.intents)) {
+    const length = props.options.ws?.intents.length as number;
+
+    for (let i = 0; i < length; i++) {
+      const intentKey = props.options.ws?.intents[i] as unknown as keyof typeof Intents;
+      props.intents |= Intents[intentKey];
+    }
+  }
 
   return props;
 });

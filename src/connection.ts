@@ -57,7 +57,8 @@ const processData = ((client: Client, data: Data): void => {
           activities: [],
           since: Date.now(),
           afk: false
-        }
+        },
+        intents: client.intents
       }
     });
 
@@ -82,4 +83,7 @@ export const connect = ((client: Client): void => {
   client.ws.on("message", async (data) => {
     await processData(client, data);
   });
+
+  client.ws.on("error", console.log);
+  client.ws.on("close", console.log);
 });
