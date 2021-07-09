@@ -67,6 +67,7 @@ const processData = (async (client: Client, data: Data): Promise<void> => {
   } else if (parsed.op == 0) {
     if (parsed.t == "READY") {
       client.id = parsed.d.user.id as string;
+      client.sessionID = parsed.d.session_id;
       client.users.set(client.id, prepareClientUser(client, parsed.d.user));
 
       if (client.events.preReady) {

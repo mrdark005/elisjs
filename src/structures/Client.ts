@@ -33,6 +33,7 @@ export interface Client {
   ws?: WebSocket;
   intents: number;
   lastSequence: number | null;
+  sessionID: string | null;
 
   events: ClientEvents;
   login: (() => void);
@@ -49,7 +50,7 @@ export const create = ((token: string, options: ClientOptions): Client => {
       },
     }, options),
     token,
-    get user() {
+    get user(): ClientUser | null {
       if (this.id && this.users.has(this.id as string)) {
         return this.users.get(this.id as string) as ClientUser;
       } else {
@@ -59,8 +60,9 @@ export const create = ((token: string, options: ClientOptions): Client => {
     guilds: new Collection<string, Guild>(),
     users: new Collection<string, User>(),
 
-    lastSequence: null,
     intents: 0,
+    lastSequence: null,
+    sessionID: null,
 
     events: {},
     login() {
