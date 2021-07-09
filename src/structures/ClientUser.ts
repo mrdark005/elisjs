@@ -1,4 +1,4 @@
-import { sendData } from "../connection";
+import { sendData } from "../gateway";
 
 import { Client } from "./Client";
 
@@ -9,7 +9,7 @@ export interface ClientUser {
   presence: Presence;
 }
 
-export const create = ((client: Client, payload: Record<string, any>): ClientUser => {
+export const prepareClientUser = ((client: Client, payload: Record<string, any>): ClientUser => {
   let _status: Status = "online";
 
   const props: ClientUser = ({

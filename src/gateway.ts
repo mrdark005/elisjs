@@ -1,7 +1,7 @@
 import WebSocket, { Data } from "ws";
 
 import { Client } from "./structures/Client";
-import { create as clientUserCreate } from "./structures/ClientUser";
+import { prepareClientUser } from "./structures/ClientUser";
 
 import { gatewayURL } from "./constants";
 
@@ -67,7 +67,7 @@ const processData = (async (client: Client, data: Data): Promise<void> => {
   } else if (parsed.op == 0) {
     if (parsed.t == "READY") {
       client.id = parsed.d.user.id as string;
-      client.users.set(client.id, clientUserCreate(client, parsed.d.user));
+      client.users.set(client.id, prepareClientUser(client, parsed.d.user));
 
       if (client.events.preReady) {
         await client.events.preReady();
