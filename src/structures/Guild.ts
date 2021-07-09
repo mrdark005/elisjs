@@ -2,9 +2,9 @@ export interface Guild {
   id: string;
 }
 
-export const create = ((payload: Record<string, unknown>): Guild => {
+export const create = ((payload: Record<string, any>): Guild => {
   const props: Guild = ({
-    id: payload.id as string
+    id: payload.id
   });
 
   return props;

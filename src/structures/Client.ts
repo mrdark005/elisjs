@@ -1,6 +1,6 @@
 import WebSocket from "ws";
 
-import { connect } from "../connection";
+import { connect } from "../gateway";
 
 import { User } from "./User";
 import { ClientUser } from "./ClientUser";
@@ -9,6 +9,10 @@ import { Guild } from "./Guild";
 import Collection from "../utils/Collection";
 
 import { Intents, Intents_ALL } from "../constants";
+
+export interface ClientEvents {
+  preReady?(): Promise<void> | void;
+}
 
 export interface ClientOptions {
   compress?: boolean;
@@ -30,6 +34,7 @@ export interface Client {
   intents: number;
   lastSequence: number | null;
 
+  events: ClientEvents;
   login: (() => void);
 }
 
@@ -57,6 +62,7 @@ export const create = ((token: string, options: ClientOptions): Client => {
     lastSequence: null,
     intents: 0,
 
+    events: {},
     login() {
       return connect(this);
     }

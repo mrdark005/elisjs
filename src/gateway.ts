@@ -1,6 +1,7 @@
 import WebSocket, { Data } from "ws";
 
 import { Client } from "./structures/Client";
+import { create as clientUserCreate } from "./structures/ClientUser";
 
 import { gatewayURL } from "./constants";
 
@@ -14,12 +15,12 @@ try {
   });
 } catch {}
 
-export const sendData = ((client: Client, data: Record<string, unknown>): void => {
+export const sendData = ((client: Client, data: Record<string, any>): void => {
   client.ws?.send(JSON.stringify(data));
 });
 
-const processData = ((client: Client, data: Data): void => {
-  let parsed: Record<string, unknown>;
+const processData = (async (client: Client, data: Data): Promise<void> => {
+  let parsed: Record<string, any>;
 
   if (client.options.compress) {
     if (data instanceof ArrayBuffer) {
@@ -38,7 +39,7 @@ const processData = ((client: Client, data: Data): void => {
     parsed = JSON.parse(data as string);
   }
 
-  client.lastSequence = parsed.s as (number | null);
+  client.lastSequence = parsed.s;
 
   if (parsed.op == 10) {
     sendData(client, {
@@ -53,7 +54,7 @@ const processData = ((client: Client, data: Data): void => {
         compress: client.options.compress,
         large_threshold: client.options.ws?.largeThreshold,
         presence: {
-          status: client.user?.presence.status,
+          status: client.user?.presence.getStatus(),
           activities: [],
           since: Date.now(),
           afk: false
@@ -62,11 +63,20 @@ const processData = ((client: Client, data: Data): void => {
       }
     });
 
-    initHeartbeat(client, parsed.d as Record<string, unknown>);
+    initHeartbeat(client, parsed.d);
+  } else if (parsed.op == 0) {
+    if (parsed.t == "READY") {
+      client.id = parsed.d.user.id as string;
+      client.users.set(client.id, clientUserCreate(client, parsed.d.user));
+
+      if (client.events.preReady) {
+        await client.events.preReady();
+      }
+    }
   }
 });
 
-const initHeartbeat = ((client: Client, payload: Record<string, unknown>): void => {
+const initHeartbeat = ((client: Client, payload: Record<string, any>): void => {
   setInterval(() => {
     sendData(client, {
       op: 1,

@@ -9,27 +9,28 @@ export interface ClientUser {
   presence: Presence;
 }
 
-export const create = ((client: Client, payload: Record<string, unknown>): ClientUser => {
+export const create = ((client: Client, payload: Record<string, any>): ClientUser => {
+  let _status: Status = "online";
+
   const props: ClientUser = ({
-    id: payload.id as string,
+    id: payload.id,
     presence: {
-      _status: "online",
-      get status(): Status {
-        return this._status
-      },
-      set status(status: Status) {
-        this._status = status;
+      getStatus: ((): Status => {
+        return _status;
+      }),
+      setStatus: ((data: Status): void => {
+        _status = data;
 
         sendData(client, {
           op: 3,
           d: {
             since: Date.now(),
             activities: [],
-            status: this.status,
+            status: _status,
             afk: false
           }
         });
-      }
+      })
     }
   });
 
