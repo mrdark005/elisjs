@@ -12,6 +12,7 @@ import { Intents, Intents_ALL } from "../constants";
 
 export interface ClientEvents {
   preReady?(): Promise<void> | void;
+  raw?(raw: Record<string, any>): Promise<void> | void;
 }
 
 export interface ClientOptions {

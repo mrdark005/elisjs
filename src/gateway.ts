@@ -65,6 +65,10 @@ const processData = (async (client: Client, data: Data): Promise<void> => {
 
     initHeartbeat(client, parsed.d);
   } else if (parsed.op == 0) {
+    if (client.events.raw) {
+      await client.events.raw(parsed);
+    }
+
     if (parsed.t == "READY") {
       client.id = parsed.d.user.id as string;
       client.sessionID = parsed.d.session_id;
