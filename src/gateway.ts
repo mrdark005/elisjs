@@ -1,11 +1,13 @@
 import WebSocket, { Data } from "ws";
 
 import { Client } from "./structures/Client";
+import { prepareGuild, Guild } from "./structures/Guild";
 import { prepareClientUser } from "./structures/ClientUser";
 
 import { gatewayURL } from "./constants";
 
 let zlib: any;
+let waitingGuilds: string[] = [];
 let inflator: any;
 
 try {
@@ -72,10 +74,42 @@ const processData = (async (client: Client, data: Data): Promise<void> => {
     if (parsed.t == "READY") {
       client.id = parsed.d.user.id as string;
       client.sessionID = parsed.d.session_id;
+      waitingGuilds = parsed.d.guilds.map((guild: Guild) => guild.id);
       client.users.set(client.id, prepareClientUser(client, parsed.d.user));
 
       if (client.events.preReady) {
         await client.events.preReady();
+      }
+    } else if (parsed.t == "GUILD_CREATE") {
+      const guild = prepareGuild(client, parsed.d);
+
+      if (waitingGuilds.length == 0 && client.events.guildCreate) {
+        await client.events.guildCreate(guild);
+      } else if (waitingGuilds.includes(parsed.d.id)) {
+        waitingGuilds = waitingGuilds.filter((guildID) => guildID != guild.id);
+
+        if (waitingGuilds.length == 0 && client.events.ready) {
+          await client.events.ready();
+        }
+      }
+
+      client.guilds.set(guild.id, guild);
+    } else if (parsed.t == "GUILD_DELETE") {
+      const guild = client.guilds.get(parsed.d.id) as Guild;
+
+      if (parsed.d.unavailable) {
+        guild.unavailable = true;
+        client.guilds.set(parsed.d.id, guild);
+
+        if (client.events.guildUnavailable) {
+          await client.events.guildUnavailable(guild);
+        }
+      } else if (!parsed.d.unavailable) {
+        if (client.events.guildDelete) {
+          await client.events.guildDelete(guild);
+        }
+
+        client.guilds.delete(guild.id);
       }
     }
   }

@@ -12,7 +12,11 @@ import { Intents, Intents_ALL } from "../constants";
 
 export interface ClientEvents {
   preReady?(): Promise<void> | void;
+  ready?(): Promise<void> | void;
   raw?(raw: Record<string, any>): Promise<void> | void;
+  guildCreate?(guild: Guild): Promise<void> | void;
+  guildDelete?(guild: Guild): Promise<void> | void;
+  guildUnavailable?(guild: Guild): Promise<void> | void;
 }
 
 export interface ClientOptions {
