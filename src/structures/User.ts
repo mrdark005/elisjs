@@ -9,7 +9,7 @@ export interface User {
   presence: Presence;
 }
 
-export const prepareUser = ((payload: Record<string, any>): User => {
+export const prepareUser = ((payload: Record<string, any>) => {
   let _status: Status = "online";
   let _activities: Activity[] = [];
 

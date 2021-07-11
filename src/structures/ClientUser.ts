@@ -2,7 +2,13 @@ import { sendData } from "../gateway";
 
 import { Client } from "./Client";
 
-import { Status, Presence, SendableActivity, Activity } from "../types/Presence";
+import { Status, Presence, Activity } from "../types/Presence";
+
+export interface SendableActivity {
+  name: string;
+  type: number;
+  url?: string;
+}
 
 export interface ClientUser {
   id: string;
@@ -10,7 +16,12 @@ export interface ClientUser {
   discriminator: string;
   avatar: string | null;
   bot: boolean;
-  presence: Presence;
+  presence: Presence & {
+    setStatus(data: Status): void;
+    setActivities(activities: SendableActivity[]): void;
+    addActivity(activity: SendableActivity): void;
+    removeActivity(index: number): void;
+  };
 }
 
 export const prepareClientUser = ((client: Client, payload: Record<string, any>): ClientUser => {

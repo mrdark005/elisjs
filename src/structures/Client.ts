@@ -44,7 +44,7 @@ export interface Client {
   login: (() => void);
 }
 
-export const create = ((token: string, options: ClientOptions): Client => {
+export const create = ((token: string, options: ClientOptions) => {
   const props: Client = ({
     id: undefined,
     options: Object.assign({

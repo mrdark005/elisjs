@@ -11,7 +11,7 @@ export interface Guild {
   owner: User;
 }
 
-export const prepareGuild = ((client: Client, payload: Record<string, any>): Guild => {
+export const prepareGuild = ((client: Client, payload: Record<string, any>) => {
   const props: Guild = ({
     id: payload.id,
     unavailable: payload.unavailable || false,
