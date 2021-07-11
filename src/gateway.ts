@@ -7,8 +7,9 @@ import { prepareClientUser } from "./structures/ClientUser";
 import { gatewayURL } from "./constants";
 
 let zlib: any;
-let waitingGuilds: string[] = [];
 let inflator: any;
+let interval: any;
+let waitingGuilds: string[] = [];
 
 try {
   zlib = require("zlib-sync");
@@ -66,6 +67,23 @@ const processData = (async (client: Client, data: Data): Promise<void> => {
     });
 
     initHeartbeat(client, parsed.d);
+  } else if (parsed.op == 9) {
+    if (parsed.d) {
+      client.ws?.close();
+      clearInterval(interval);
+      connect(client);
+
+      sendData(client, {
+        op: 6,
+        d: {
+          token: client.token,
+          session_id: client.sessionID,
+          seq: client.lastSequence
+        }
+      });
+    } else {
+      throw new Error("The session is invalid for now, cannot resume.");
+    }
   } else if (parsed.op == 0) {
     if (client.events.raw) {
       await client.events.raw(parsed);
@@ -116,7 +134,7 @@ const processData = (async (client: Client, data: Data): Promise<void> => {
 });
 
 const initHeartbeat = ((client: Client, payload: Record<string, any>): void => {
-  setInterval(() => {
+  interval = setInterval(() => {
     sendData(client, {
       op: 1,
       d: client.lastSequence
@@ -134,5 +152,11 @@ export const connect = ((client: Client): void => {
   });
 
   client.ws.on("error", console.log);
-  client.ws.on("close", console.log);
+  client.ws.on("close", (code, error) => {
+    if (code == 4014) {
+      throw new Error("Disallowed intents, please check these.");
+    } else {
+      console.log(code, error);
+    }
+  });
 });
