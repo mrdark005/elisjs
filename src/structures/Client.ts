@@ -23,7 +23,7 @@ export interface ClientOptions {
   compress?: boolean;
   ws?: {
     largeThreshold: number;
-    intents: number | Intents[]
+    intents: number | Intents[] | (keyof typeof Intents)[]
   }
 }
 
@@ -78,11 +78,22 @@ export const create = ((token: string, options: ClientOptions) => {
   if (typeof props.options.ws?.intents == "number") {
     props.intents = props.options.ws?.intents;
   } else if (Array.isArray(props.options.ws?.intents)) {
-    const length = props.options.ws?.intents.length as number;
+    const wsOptions = props.options.ws as NonNullable<ClientOptions["ws"]>;
+    let intents = wsOptions.intents as any[];
 
-    for (let i = 0; i < length; i++) {
-      const intentKey = props.options.ws?.intents[i] as unknown as keyof typeof Intents;
-      props.intents |= Intents[intentKey];
+    if (intents.length > 0 && typeof intents[0] == "string") {
+      const intentsLength = intents.length;
+
+      for (let i = 0; i < intentsLength; i++) {
+        const intentKey = intents[i] as keyof typeof Intents;
+        props.intents |= Intents[intentKey];
+      }
+    } else if (intents.length > 0 && typeof intents[0] == "number") {
+      const intentsLength = intents.length;
+
+      for (let i = 0; i < intentsLength; i++) {
+        props.intents |= intents[i] as number;
+      }
     }
   }
 
