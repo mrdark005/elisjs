@@ -18,12 +18,19 @@ try {
   });
 } catch {}
 
-export const sendData = ((client: Client, data: Record<string, any>): void => {
+export interface GatewayData {
+  op: number;
+  d: any;
+  s?: number;
+  t?: string;
+}
+
+export const sendData = ((client: Client, data: GatewayData): void => {
   client.ws?.send(JSON.stringify(data));
 });
 
 const processData = (async (client: Client, data: Data): Promise<void> => {
-  let parsed: Record<string, any>;
+  let parsed: GatewayData;
 
   if (client.options.compress) {
     if (data instanceof ArrayBuffer) {
@@ -42,7 +49,7 @@ const processData = (async (client: Client, data: Data): Promise<void> => {
     parsed = JSON.parse(data as string);
   }
 
-  client.lastSequence = parsed.s;
+  client.lastSequence = parsed.s || null;
 
   if (parsed.op == 10) {
     sendData(client, {
