@@ -14,9 +14,12 @@ export interface ClientEvents {
   preReady?(): Promise<void> | void;
   ready?(): Promise<void> | void;
   raw?(raw: Record<string, any>): Promise<void> | void;
+
   guildCreate?(guild: Guild): Promise<void> | void;
   guildDelete?(guild: Guild): Promise<void> | void;
+  guildUpdate?(oldGuild: Guild, newGuild: Guild): Promise<void> | void;
   guildUnavailable?(guild: Guild): Promise<void> | void;
+
   userUpdate?(oldUser: User, newUser: User): Promise<void> | void;
 }
 

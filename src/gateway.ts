@@ -137,6 +137,15 @@ const processData = (async (client: Client, data: Data): Promise<void> => {
 
         client.guilds.delete(guild.id);
       }
+    } else if (parsed.t == "GUILD_UPDATE") {
+      const oldGuild = client.guilds.get(parsed.d.id) as Guild;
+      const newGuild = prepareGuild(client, parsed.d);
+
+      client.guilds.set(newGuild.id, newGuild);
+
+      if (client.events.guildUpdate) {
+        await client.events.guildUpdate(oldGuild, newGuild);
+      }
     } else if (parsed.t == "USER_UPDATE") {
       const oldUser = client.users.get(parsed.d.id) as User;
       const newUser = prepareUser(parsed.d);
