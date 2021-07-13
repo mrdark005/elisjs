@@ -2,6 +2,8 @@ import { sendData } from "../gateway";
 
 import { Client } from "./Client";
 
+import getTimestamp from "../utils/getTimestamp";
+
 import { Status, Presence, Activity } from "../types/Presence";
 
 export interface SendableActivity {
@@ -14,6 +16,7 @@ export interface ClientUser {
   id: string;
   username: string;
   discriminator: string;
+  createdAt: number;
   avatar: string | null;
   bot: boolean;
   presence: Presence & {
@@ -32,6 +35,7 @@ export const prepareClientUser = ((client: Client, payload: Record<string, any>)
     id: payload.id,
     username: payload.username,
     discriminator: payload.disciminator,
+    createdAt: getTimestamp(payload.id),
     avatar: payload.avatar,
     bot: payload.bot || false,
     presence: {

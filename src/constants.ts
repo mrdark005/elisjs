@@ -18,3 +18,4 @@ export enum Intents {
 
 export const Intents_ALL = 32767;
 export const gatewayURL = "wss://gateway.discord.gg/?v=9";
+export const DISCORD_EPOCH = 1420070400000;
