@@ -17,6 +17,7 @@ export interface ClientEvents {
   guildCreate?(guild: Guild): Promise<void> | void;
   guildDelete?(guild: Guild): Promise<void> | void;
   guildUnavailable?(guild: Guild): Promise<void> | void;
+  userUpdate?(oldUser: User, newUser: User): Promise<void> | void;
 }
 
 export interface ClientOptions {

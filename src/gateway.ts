@@ -3,6 +3,7 @@ import WebSocket, { Data } from "ws";
 import { Client } from "./structures/Client";
 import { prepareGuild, Guild } from "./structures/Guild";
 import { prepareClientUser } from "./structures/ClientUser";
+import { prepareUser, User } from "./structures/User";
 
 import { gatewayURL } from "./constants";
 
@@ -135,6 +136,15 @@ const processData = (async (client: Client, data: Data): Promise<void> => {
         }
 
         client.guilds.delete(guild.id);
+      }
+    } else if (parsed.t == "USER_UPDATE") {
+      const oldUser = client.users.get(parsed.d.id) as User;
+      const newUser = prepareUser(parsed.d);
+
+      client.users.set(newUser.id, newUser);
+
+      if (client.events.userUpdate) {
+        await client.events.userUpdate(oldUser, newUser);
       }
     }
   }
