@@ -119,8 +119,16 @@ const processData = (async (client: Client, data: Data): Promise<void> => {
         }
       }
 
+      while (parsed.d.members.length != 0) {
+        const user = prepareUser(parsed.d.members[0].user);
+        client.users.set(user.id, user);
+
+        parsed.d.members.shift();
+      }
+
       client.guilds.set(guild.id, guild);
     } else if (parsed.t == "GUILD_DELETE") {
+      // TODO: make member structure and members property, delete users cache from members property.
       const guild = client.guilds.get(parsed.d.id) as Guild;
 
       if (parsed.d.unavailable) {
