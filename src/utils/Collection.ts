@@ -38,6 +38,14 @@ class Collection<K, V> extends Map<K, V> {
     return result;
   }
 
+  first() {
+    return this.array()[0];
+  }
+
+  last() {
+    return this.array()[this.size - 1];
+  }
+
   // TODO: integrate util.inspect() to detect the objects.
   at(value: V) {
     const data = this.find((v) => v == value);
