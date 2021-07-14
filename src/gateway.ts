@@ -4,6 +4,7 @@ import { Client } from "./structures/Client";
 import { prepareGuild, Guild } from "./structures/Guild";
 import { prepareClientUser } from "./structures/ClientUser";
 import { prepareUser, User } from "./structures/User";
+import { prepareEmoji } from "./structures/Emoji";
 
 import { gatewayURL } from "./constants";
 
@@ -109,6 +110,22 @@ const processData = (async (client: Client, data: Data): Promise<void> => {
     } else if (parsed.t == "GUILD_CREATE") {
       const guild = prepareGuild(client, parsed.d);
 
+      while (parsed.d.members.length != 0) {
+        const user = prepareUser(parsed.d.members[0].user);
+        client.users.set(user.id, user);
+
+        parsed.d.members.shift();
+      }
+
+      while (parsed.d.emojis.length != 0) {
+        const emoji = prepareEmoji(guild, parsed.d.emojis[0]);
+        guild.emojis.set(emoji.id, emoji);
+
+        parsed.d.emojis.shift();
+      }
+
+      client.guilds.set(guild.id, guild);
+
       if (waitingGuilds.length == 0 && client.events.guildCreate) {
         await client.events.guildCreate(guild);
       } else if (waitingGuilds.includes(parsed.d.id)) {
@@ -118,15 +135,6 @@ const processData = (async (client: Client, data: Data): Promise<void> => {
           await client.events.ready();
         }
       }
-
-      while (parsed.d.members.length != 0) {
-        const user = prepareUser(parsed.d.members[0].user);
-        client.users.set(user.id, user);
-
-        parsed.d.members.shift();
-      }
-
-      client.guilds.set(guild.id, guild);
     } else if (parsed.t == "GUILD_DELETE") {
       // TODO: make member structure and members property, delete users cache from members property.
       const guild = client.guilds.get(parsed.d.id) as Guild;
@@ -141,6 +149,13 @@ const processData = (async (client: Client, data: Data): Promise<void> => {
       } else if (!parsed.d.unavailable) {
         if (client.events.guildDelete) {
           await client.events.guildDelete(guild);
+        }
+
+        while (guild.emojis.size != 0) {
+          const emoji = prepareEmoji(guild, guild.emojis.first());
+          guild.emojis.delete(emoji.id);
+
+          guild.emojis.shift();
         }
 
         client.guilds.delete(guild.id);

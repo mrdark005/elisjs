@@ -1,6 +1,8 @@
 import { Client } from "./Client";
+import { Emoji } from "./Emoji";
 
 import getTimestamp from "../utils/getTimestamp";
+import Collection from "../utils/Collection";
 
 export interface Guild {
   id: string;
@@ -8,6 +10,7 @@ export interface Guild {
   unavailable: boolean;
   name: string;
   createdAt: number;
+  emojis: Collection<string, Emoji>;
   icon: string | null;
   splash: string | null;
   ownerID: string;
@@ -20,6 +23,7 @@ export const prepareGuild = ((client: Client, payload: Record<string, any>) => {
     unavailable: payload.unavailable || false,
     name: payload.name,
     createdAt: getTimestamp(payload.id),
+    emojis: new Collection(),
     icon: payload.icon || null,
     splash: payload.splash || null,
     ownerID: payload.owner_id

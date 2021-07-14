@@ -63,8 +63,8 @@ export const create = ((token: string, options: ClientOptions) => {
     getUser: (() => {
       return props.users.get(props.id as string) as (ClientUser | undefined);
     }),
-    guilds: new Collection<string, Guild>(),
-    users: new Collection<string, User>(),
+    guilds: new Collection(),
+    users: new Collection(),
 
     intents: 0,
     lastSequence: null,
