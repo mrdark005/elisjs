@@ -23,6 +23,21 @@ class Collection<K, V> extends Map<K, V> {
     return this.array().map(cb);
   }
 
+  shift() {
+    const result = this.array()[0];
+    this.delete(this.keyArray()[0]);
+
+    return result;
+  }
+
+  pop() {
+    const lastIndex = this.size - 1;
+    const result = this.array()[lastIndex];
+    this.delete(this.keyArray()[lastIndex]);
+
+    return result;
+  }
+
   // TODO: integrate util.inspect() to detect the objects.
   at(value: V) {
     const data = this.find((v) => v == value);
