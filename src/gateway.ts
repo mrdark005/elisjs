@@ -65,7 +65,7 @@ const processData = (async (client: Client, data: Data): Promise<void> => {
         compress: client.options.compress,
         large_threshold: client.options.ws?.largeThreshold,
         presence: {
-          status: client.user?.presence.getStatus(),
+          status: client.getUser()?.presence.getStatus(),
           activities: [],
           since: Date.now(),
           afk: false
